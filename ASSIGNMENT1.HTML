@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Quiz</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #e8f0fe;
+  margin: 0;
+  padding: 30px;
+}
+
+.box {
+  max-width: 500px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px #bbb;
+}
+
+h1, h2 {
+  color: #2563eb;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.option {
+  display: block;
+  padding: 10px;
+  margin: 8px 0;
+  background: #f1f5f9;
+  border-radius: 6px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- INFO PAGE -->
+<div id="infoPage" class="box page active">
+  <h1>Student Quiz</h1>
+  <h2>Quiz Information</h2>
+
+  <p>Welcome to the Student Quiz.</p>
+  <p>• The quiz contains 5 questions.</p>
+  <p>• Each question has one correct answer.</p>
+  <p>• Read each question carefully.</p>
+  <p>• Select your answer and click Next.</p>
+  <p>• Your final score will be displayed at the end.</p>
+
+  <button onclick="openPage('detailsPage')">
+    Continue
+  </button>
+</div>
+
+<!-- STUDENT DETAILS PAGE -->
+<div id="detailsPage" class="box page">
+  <h2>Student Details</h2>
+
+  <input type="text" id="rollNo" placeholder="Roll No.">
+  <input type="text" id="studentName" placeholder="Name">
+  <input type="text" id="classSection" placeholder="Class & Section">
+
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<!-- QUIZ PAGE -->
+<div id="quizPage" class="box page">
+  <h2>Student Quiz</h2>
+
+  <p id="studentInfo"></p>
+  <p id="questionNumber"></p>
+
+  <div id="question"></div>
+
+  <button onclick="nextQuestion()">Next</button>
+</div>
+
+<!-- RESULT PAGE -->
+<div id="resultPage" class="box page">
+  <h1>Quiz Complete!</h1>
+  <p id="finalStudent"></p>
+  <h2 id="score"></h2>
+
+  <button onclick="location.reload()">Start Again</button>
+</div>
+
+<script>
+
+const questions = [
+  {
+    q: "Which planet do we live on?",
+    options: ["Earth", "Mars", "Venus", "Jupiter"],
+    answer: 0
+  },
+  {
+    q: "Which gas do humans need to breathe?",
+    options: ["Oxygen", "Helium", "Hydrogen", "Nitrogen"],
+    answer: 0
+  },
+  {
+    q: "What is H₂O?",
+    options: ["Water", "Salt", "Oxygen", "Sugar"],
+    answer: 0
+  },
+  {
+    q: "Which organ pumps blood?",
+    options: ["Brain", "Heart", "Lungs", "Stomach"],
+    answer: 1
+  },
+  {
+    q: "What force pulls objects toward Earth?",
+    options: ["Friction", "Magnetism", "Gravity", "Electricity"],
+    answer: 2
+  }
+];
+
+let current = 0;
+let score = 0;
+
+function openPage(pageId) {
+  document.querySelectorAll(".page").forEach(function(page) {
+    page.classList.remove("active");
+  });
+
+  document.getElementById(pageId).classList.add("active");
+}
+
+function startQuiz() {
+
+  let roll = document.getElementById("rollNo").value.trim();
+  let name = document.getElementById("studentName").value.trim();
+  let cls = document.getElementById("classSection").value.trim();
+
+  if (roll === "" || name === "" || cls === "") {
+    alert("Please enter Roll No., Name and Class & Section.");
+    return;
+  }
+
+  document.getElementById("studentInfo").innerHTML =
+    "Name: " + name +
+    "<br>Roll No.: " + roll +
+    "<br>Class: " + cls;
+
+  openPage("quizPage");
+  showQuestion();
+}
+
+function showQuestion() {
+
+  let q = questions[current];
+
+  document.getElementById("questionNumber").innerText =
+    "Question " + (current + 1) + " of " + questions.length;
+
+  let html = "<h3>" + q.q + "</h3>";
+
+  q.options.forEach(function(option, index) {
+    html += `
+      <label class="option">
+        <input type="radio" name="answer" value="${index}">
+        ${option}
+      </label>
+    `;
+  });
+
+  document.getElementById("question").innerHTML = html;
+}
+
+function nextQuestion() {
+
+  let selected = document.querySelector(
+    'input[name="answer"]:checked'
+  );
+
+  if (!selected) {
+    alert("Please select an answer.");
+    return;
+  }
+
+  if (Number(selected.value) === questions[current].answer) {
+    score++;
+  }
+
+  current++;
+
+  if (current < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+
+  let name = document.getElementById("studentName").value;
+
+  document.getElementById("finalStudent").innerText =
+    "Student: " + name;
+
+  document.getElementById("score").innerText =
+    "Your Score: " + score + " / " + questions.length;
+
+  openPage("resultPage");
+}
+
+</script>
+
+</body>
+</html>
